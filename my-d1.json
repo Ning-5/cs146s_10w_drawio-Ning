@@ -1,0 +1,12 @@
+{
+  "nodes": [
+    {"id": "receive", "label": "接收退货"},
+    {"id": "inspect", "label": "质检"},
+    {"id": "shelve", "label": "登记入库"}
+  ],
+  "edges": [
+  {"source": "receive", "target": "inspect", "label": ""},
+  {"source": "inspect", "target": "shelve", "label": ""}
+],
+  "questions": []
+}
