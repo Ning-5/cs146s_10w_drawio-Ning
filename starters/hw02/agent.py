@@ -17,11 +17,81 @@ def local_model(messages: list[dict], tools: list[dict]) -> dict:
 
 
 def run_agent(request: str, model: Callable = local_model) -> dict:
-    # TODO: 返回 {answer, stop_reason, events}，记录实际执行过程。
-    # 按顺序处理每个工具调用，保存 assistant 消息和工具返回消息。
-    # 分别统计模型请求轮数和工具调用次数；修改要求不明确时询问用户。
-    # 根据最新工具结果核对最终回答，完成修改后需要复查。
-    raise NotImplementedError("请先实现有轮数与调用次数限制的 Agent 循环，以及任务完成判断")
+    from tools import reset_snapshots
+    import json as _json
+
+    reset_snapshots()  # 每次 run_agent 隔离快照表
+
+    system = (
+        "你是 drawio 图表修复助手。只能通过提供的工具读取和修改文件。"
+        "修改前必须先 read_diagram 获取最新 version；"
+        "完成所有修改后，用 inspect_diagram 复查问题数，再给出最终回答。"
+    )
+    messages: list[dict] = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": request},
+    ]
+
+    events: list[dict] = []
+    turns = 0
+    tool_calls_used = 0
+    last_tool_result: dict | None = None
+    apply_failed = False
+
+
+    for _ in range(MAX_TURNS):
+        turns += 1
+        reply = model(messages, TOOLS)          # ← 每次调用模型记一轮
+        messages.append(reply)                   # 保存 assistant 消息（含 tool_calls）
+
+        calls = reply.get("tool_calls") or []
+        if not calls:
+            # 模型不再调工具：给出文字回答
+            content = (reply.get("content") or "").strip()
+            if apply_failed:
+                # 复查未通过：最后一步工具失败，不算完成
+                events.append({"type": "final_unverified", "content": content})
+                return {"answer": content, "stop_reason": "unverified",
+                        "events": events, "turns": turns, "tool_calls": tool_calls_used}
+            events.append({"type": "final", "content": content})
+            return {"answer": content, "stop_reason": "completed",
+                    "events": events, "turns": turns, "tool_calls": tool_calls_used}
+
+        # 按顺序处理每个工具调用
+        for call in calls:
+            if tool_calls_used >= MAX_TOOL_CALLS:
+                events.append({"type": "limit", "kind": "max_tool_calls"})
+                return {"answer": "工具调用次数已达上限，任务中止。",
+                        "stop_reason": "max_tool_calls",
+                        "events": events, "turns": turns, "tool_calls": tool_calls_used}
+            fn = call["function"]["name"]
+            raw_args = call["function"].get("arguments") or {}
+            # Ollama 有时把 arguments 给成 JSON 字符串
+            args = _json.loads(raw_args) if isinstance(raw_args, str) else raw_args
+
+            result = dispatch(fn, args)          # ← 每次调用工具记一次
+            tool_calls_used += 1
+            last_tool_result = result
+            if fn == "apply_changes" and not result["ok"] and args.get("operations"):
+                apply_failed = True
+
+            events.append({"type": "tool_call", "name": fn,
+                           "args": args,
+                           "ok": result["ok"],
+                           "error": result["error"]})
+
+            # 工具返回消息必须带 tool_call_id，模型才能把结果对上调用
+            messages.append({
+                "role": "tool",
+                "tool_call_id": call.get("id"),
+                "name": fn,
+                "content": _json.dumps(result, ensure_ascii=False),
+            })
+
+    events.append({"type": "limit", "kind": "max_turns"})
+    return {"answer": "已达到最大轮数限制，未能完成任务。",
+            "stop_reason": "max_turns",
+            "events": events, "turns": turns, "tool_calls": tool_calls_used}
 
 
 if __name__ == "__main__":
