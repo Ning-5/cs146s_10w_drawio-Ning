@@ -41,7 +41,13 @@ def run_agent(request: str, model: Callable = local_model) -> dict:
 
     for _ in range(MAX_TURNS):
         turns += 1
-        reply = model(messages, TOOLS)          # ← 每次调用模型记一轮
+        try:
+            reply = model(messages, TOOLS)
+        except Exception as exc:
+            events.append({"type": "model_error", "error": f"{type(exc).__name__}: {exc}"})
+            return {"answer": "模型服务不可用，任务已停止。",
+                    "stop_reason": "model_error",
+                    "events": events, "turns": turns, "tool_calls": tool_calls_used}
         messages.append(reply)                   # 保存 assistant 消息（含 tool_calls）
 
         calls = reply.get("tool_calls") or []
