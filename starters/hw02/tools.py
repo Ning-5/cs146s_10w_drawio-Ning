@@ -12,16 +12,16 @@ DIAGRAM_NAME = "practice.drawio"   # 工作区中的文件名（适配器要求�
 TOOLS: list[dict] = [
     {"function": {
         "name": "read_diagram",
-        "description": "读取 drawio 文件。name 传页面名返回该页详情；传空字符串返回所有页面的概览（页面 id/名称/图元数量）。",
+        "description": "读取当前工作区的 drawio 文件。name 只接受页面名称或空字符串：传页面名（如 流程 A）返回该页详情（含每个图元的 id 与当前名称）；传空字符串返回所有页面的概览（每页 id/name/图元数量、文件快照标识、version）。不要传文件名（如 practice.drawio）或页面 id（如 page-a），两者都会被拒绝（ok:false）。读取失败时必须如实告知用户，不得把概览数据当作该页内容，也不得静默改查其他页面顶替。",
         "parameters": {
             "type": "object",
-            "properties": {"name": {"type": "string", "description": "页面名称，空字符串=全部页面概览"}},
+            "properties": {"name": {"type": "string", "description": "页面名称（取自概览返回的 name 字段，如 流程 A）；空字符串=全部页面概览。不接受文件名（practice.drawio）与页面 id（page-a）"}},
             "required": ["name"],
         },
     }},
     {"function": {
         "name": "inspect_diagram",
-        "description": "检查页面的名称和端点引用问题：空页面名、空图元名称、连接线的 source/target 指向不存在的图元。",
+        "description": "检查页面质量，返回 issues（每项含 page/kind/cell）与 count。已知 kind：empty_cell_name=图元名称为空或纯空白；连接线端点指向不存在图元的问题也会列出。name 填页面名称（如 流程 A）；空字符串=检查所有页面。警告：name 不匹配任何页面（例如误传页面 id 或文件名）时返回 ok:false 与 invalid_arguments（未找到页面），不会静默返回空结果；name 正确且 count=0 才表示无问题。完成修改后应再次检查确认。",
         "parameters": {
             "type": "object",
             "properties": {"name": {"type": "string", "description": "页面名称，空字符串=检查所有页面"}},
@@ -34,9 +34,9 @@ TOOLS: list[dict] = [
         "parameters": {
             "type": "object",
             "properties": {
-                "expected_version": {"type": "string", "description": "最近一次读取返回的 version"},
+                "expected_version": {"type": "string", "description": "最近一次 read_diagram 返回的 version 原文（64 位十六进制字符串），必须从工具结果原样复制，禁止编造"},
                                 "operations": {"type": "array", "items": {"type": "object"},
-                               "description": "操作列表，每项必须含 op、page_id、cell_id。op 取值：rename_node{page_id,cell_id,label}（改节点名）/ add_edge{page_id,cell_id,source,target}（新建连接线）/ set_endpoints{page_id,cell_id,source,target}（改已有连接线的两端）"},
+                               "description": "操作列表，每项必须含 op、page_id、cell_id。page_id 填页面 id（概览返回的 id，如 page-a）——注意 read_diagram 与 inspect_diagram 用页面名称（如 流程 A），此处用页面 id，两者不同。op 取值：rename_node{page_id,cell_id,label}（改节点名，label 可为空字符串）/ add_edge{page_id,cell_id,source,target}（新建连接线，cell_id 为新线 id，source/target 为已有图元 id）/ set_endpoints{page_id,cell_id,source,target}（改已有连接线的两端）"},
 
 
             },
@@ -107,8 +107,10 @@ def inspect_tool(name: str) -> dict:
         return _err("file_error", f"读取失败：{exc}")
     sid = _store_snapshot(snap)
     issues = []
+    matched = False
     for p in snap["pages"]:
         if name in ("", p["name"]):
+            matched = True
             if not p["name"].strip():
                 issues.append({"page": p["id"], "kind": "empty_page_name"})
             ids = {c["id"] for c in p["cells"]}
@@ -120,6 +122,8 @@ def inspect_tool(name: str) -> dict:
                     issues.append({"page": p["id"], "kind": "empty_cell_name", "cell": c["id"]})
 
 
+    if name and not matched:
+        return _err("invalid_arguments", f"未找到页面：{name}")
     return _ok({"snapshot": sid, "issues": issues, "count": len(issues)})
 
 def apply_tool(expected_version: str, operations: list[dict]) -> dict:
