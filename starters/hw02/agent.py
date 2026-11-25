@@ -78,8 +78,8 @@ def run_agent(request: str, model: Callable = local_model) -> dict:
             result = dispatch(fn, args)          # ← 每次调用工具记一次
             tool_calls_used += 1
             last_tool_result = result
-            if fn == "apply_changes" and not result["ok"] and args.get("operations"):
-                apply_failed = True
+            if fn == "apply_changes" and args.get("operations"):
+                apply_failed = not result["ok"]
 
             events.append({"type": "tool_call", "name": fn,
                            "args": args,

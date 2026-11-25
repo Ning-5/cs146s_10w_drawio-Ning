@@ -1,6 +1,6 @@
 {
   "answer": "首次调用因图元不存在失败，改用真实图元 n2 后成功。",
-  "stop_reason": "unverified",
+  "stop_reason": "completed",
   "events": [
     {
       "type": "tool_call",
@@ -40,7 +40,7 @@
       "error": null
     },
     {
-      "type": "final_unverified",
+      "type": "final",
       "content": "首次调用因图元不存在失败，改用真实图元 n2 后成功。"
     }
   ],
