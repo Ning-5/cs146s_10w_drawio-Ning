@@ -1,0 +1,32 @@
+{
+  "answer": "提供的版本号与当前文件不符，修改未执行。",
+  "stop_reason": "unverified",
+  "events": [
+    {
+      "type": "tool_call",
+      "name": "apply_changes",
+      "args": {
+        "expected_version": "0000000000000000000000000000000000000000000000000000000000000000",
+        "operations": [
+          {
+            "op": "rename_node",
+            "page_id": "page-a",
+            "cell_id": "n2",
+            "label": "步骤 2"
+          }
+        ]
+      },
+      "ok": false,
+      "error": {
+        "code": "version_conflict",
+        "message": "version_conflict: 文件已变化，请重新读取"
+      }
+    },
+    {
+      "type": "final_unverified",
+      "content": "提供的版本号与当前文件不符，修改未执行。"
+    }
+  ],
+  "turns": 2,
+  "tool_calls": 1
+}

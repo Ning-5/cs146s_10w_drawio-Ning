@@ -1,0 +1,53 @@
+{
+  "request": "tool-crash",
+  "messages": [
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "function": {
+            "name": "apply_changes",
+            "arguments": {
+              "expected_version": "b75162617b749695c1cdd6da89c4742df23f292791f05aa62fe04f7d8540e6be",
+              "operations": [
+                {
+                  "op": "rename_node",
+                  "page_id": "page-a",
+                  "cell_id": "n999",
+                  "label": "X"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "function": {
+            "name": "apply_changes",
+            "arguments": {
+              "expected_version": "b75162617b749695c1cdd6da89c4742df23f292791f05aa62fe04f7d8540e6be",
+              "operations": [
+                {
+                  "op": "rename_node",
+                  "page_id": "page-a",
+                  "cell_id": "n2",
+                  "label": "步骤 2"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "首次调用因图元不存在失败，改用真实图元 n2 后成功。"
+    }
+  ]
+}

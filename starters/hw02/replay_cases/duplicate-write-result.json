@@ -1,0 +1,49 @@
+{
+  "answer": "第二次重复提交同一写操作，应被版本机制拦下。",
+  "stop_reason": "unverified",
+  "events": [
+    {
+      "type": "tool_call",
+      "name": "apply_changes",
+      "args": {
+        "expected_version": "b75162617b749695c1cdd6da89c4742df23f292791f05aa62fe04f7d8540e6be",
+        "operations": [
+          {
+            "op": "rename_node",
+            "page_id": "page-a",
+            "cell_id": "n2",
+            "label": "步骤 2"
+          }
+        ]
+      },
+      "ok": true,
+      "error": null
+    },
+    {
+      "type": "tool_call",
+      "name": "apply_changes",
+      "args": {
+        "expected_version": "b75162617b749695c1cdd6da89c4742df23f292791f05aa62fe04f7d8540e6be",
+        "operations": [
+          {
+            "op": "rename_node",
+            "page_id": "page-a",
+            "cell_id": "n2",
+            "label": "步骤 2"
+          }
+        ]
+      },
+      "ok": false,
+      "error": {
+        "code": "version_conflict",
+        "message": "version_conflict: 文件已变化，请重新读取"
+      }
+    },
+    {
+      "type": "final_unverified",
+      "content": "第二次重复提交同一写操作，应被版本机制拦下。"
+    }
+  ],
+  "turns": 3,
+  "tool_calls": 2
+}

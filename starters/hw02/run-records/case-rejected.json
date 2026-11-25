@@ -1,0 +1,48 @@
+{
+  "id": "A2",
+  "intent": "读取后查询",
+  "request": "practice.drawio 的 page-a 有哪些步骤？请先读取。",
+  "tag": "iter1",
+  "result": {
+    "answer": "页面 \"流程 A\"（页面 ID: page-a）包含以下步骤：\n\n1. **Step 1**（图元 ID: n1）\n2. **Step 3**（图元 ID: n3）\n\n中间存在一个空节点（图元 ID: n2，值为空），但未标记为步骤。流程通过连接线（边 e1、e2）串联这三个节点。若需进一步调整，请告知具体需求。",
+    "stop_reason": "completed",
+    "events": [
+      {
+        "type": "tool_call",
+        "name": "read_diagram",
+        "args": {
+          "name": "page-a"
+        },
+        "ok": false,
+        "error": {
+          "code": "invalid_arguments",
+          "message": "未找到页面：page-a"
+        }
+      },
+      {
+        "type": "tool_call",
+        "name": "read_diagram",
+        "args": {
+          "name": ""
+        },
+        "ok": true,
+        "error": null
+      },
+      {
+        "type": "tool_call",
+        "name": "read_diagram",
+        "args": {
+          "name": "流程 A"
+        },
+        "ok": true,
+        "error": null
+      },
+      {
+        "type": "final",
+        "content": "页面 \"流程 A\"（页面 ID: page-a）包含以下步骤：\n\n1. **Step 1**（图元 ID: n1）\n2. **Step 3**（图元 ID: n3）\n\n中间存在一个空节点（图元 ID: n2，值为空），但未标记为步骤。流程通过连接线（边 e1、e2）串联这三个节点。若需进一步调整，请告知具体需求。"
+      }
+    ],
+    "turns": 4,
+    "tool_calls": 3
+  }
+}
