@@ -1,4 +1,4 @@
-﻿# HW2 实验报告：图表工作区的工具、Agent 与完成门
+# HW2 实验报告：图表工作区的工具、Agent 与完成门
 
 分支 `practice/main`。本报告每条结论均有提交哈希、归档 JSON 或 XML 物证背书。
 
@@ -41,6 +41,8 @@
 - 官方案例 1–6：sweep 全绿，档案 `.runtime/hw02/iter-results/`（events 含完整请求 args，可复现）。
 - 自构三案例（f910475，`starters/hw02/replay_cases/`）：probe-oracle 先经系统亲口确认 schema（`{op, page_id, cell_id, label}`）再生成。
 - 第 7 案例（c93c975，`starters/hw02/chosen-case/`）：见 §5。
+- 官方 replay 五案例全绿：invalid-arguments→completed、limit→max_turns、model-down→model_error、multiple-tools→completed、unknown-tool→completed（档案 .runtime/hw02/replay-official-*.txt）。
+- 代表性运行记录：`starters/hw02/run-records/`——多工具成功卷与失败拒绝卷（选自 iter-results 档案）。
 
 工具响应形状备忘：read detail 返回 `{snapshot, version, page}`，图元表在 `page.cells`（含根/层图元 "0"/"1"，适配器禁改它们）；read/apply 均登记快照，compare_changes 依赖此表做页内 diff。
 
