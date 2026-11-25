@@ -1,0 +1,49 @@
+{
+  "answer": "首次调用因图元不存在失败，改用真实图元 n2 后成功。",
+  "stop_reason": "unverified",
+  "events": [
+    {
+      "type": "tool_call",
+      "name": "apply_changes",
+      "args": {
+        "expected_version": "b75162617b749695c1cdd6da89c4742df23f292791f05aa62fe04f7d8540e6be",
+        "operations": [
+          {
+            "op": "rename_node",
+            "page_id": "page-a",
+            "cell_id": "n999",
+            "label": "X"
+          }
+        ]
+      },
+      "ok": false,
+      "error": {
+        "code": "file_error",
+        "message": "rename_node 需要已有节点和字符串 label"
+      }
+    },
+    {
+      "type": "tool_call",
+      "name": "apply_changes",
+      "args": {
+        "expected_version": "b75162617b749695c1cdd6da89c4742df23f292791f05aa62fe04f7d8540e6be",
+        "operations": [
+          {
+            "op": "rename_node",
+            "page_id": "page-a",
+            "cell_id": "n2",
+            "label": "步骤 2"
+          }
+        ]
+      },
+      "ok": true,
+      "error": null
+    },
+    {
+      "type": "final_unverified",
+      "content": "首次调用因图元不存在失败，改用真实图元 n2 后成功。"
+    }
+  ],
+  "turns": 3,
+  "tool_calls": 2
+}

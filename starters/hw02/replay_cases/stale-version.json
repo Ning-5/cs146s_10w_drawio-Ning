@@ -1,0 +1,31 @@
+{
+  "request": "stale-version",
+  "messages": [
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "function": {
+            "name": "apply_changes",
+            "arguments": {
+              "expected_version": "0000000000000000000000000000000000000000000000000000000000000000",
+              "operations": [
+                {
+                  "op": "rename_node",
+                  "page_id": "page-a",
+                  "cell_id": "n2",
+                  "label": "步骤 2"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "提供的版本号与当前文件不符，修改未执行。"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "request": "duplicate-write",
+  "messages": [
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "function": {
+            "name": "apply_changes",
+            "arguments": {
+              "expected_version": "b75162617b749695c1cdd6da89c4742df23f292791f05aa62fe04f7d8540e6be",
+              "operations": [
+                {
+                  "op": "rename_node",
+                  "page_id": "page-a",
+                  "cell_id": "n2",
+                  "label": "步骤 2"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "function": {
+            "name": "apply_changes",
+            "arguments": {
+              "expected_version": "b75162617b749695c1cdd6da89c4742df23f292791f05aa62fe04f7d8540e6be",
+              "operations": [
+                {
+                  "op": "rename_node",
+                  "page_id": "page-a",
+                  "cell_id": "n2",
+                  "label": "步骤 2"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "第二次重复提交同一写操作，应被版本机制拦下。"
+    }
+  ]
+}
